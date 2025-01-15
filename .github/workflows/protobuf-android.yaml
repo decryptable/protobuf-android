@@ -1,4 +1,4 @@
-name: Protobuf Android - ${GITHUB_REF##*/}
+name: Protobuf Android
 
 on:
   push:
