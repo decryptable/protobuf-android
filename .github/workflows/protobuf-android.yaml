@@ -51,6 +51,8 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
         
       - name: Upload Protobuf Android build to GitHub Release
         uses: actions/upload-release-asset@v1
