@@ -1,4 +1,4 @@
-name: Build Protobuf for Android
+name: Protobuf Android - ${GITHUB_REF##*/}
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
     name: Setup NDK and Checkout Repository 🔧
     runs-on: windows-latest
     outputs:
-      ndk-path: ${{ steps.setup-ndk.outputs.ndk-path }}
+      ndk-path: "${{ steps.setup-ndk.outputs.ndk-path }}"
     steps:
       - name: Checkout Protobuf repository 🔽
         uses: actions/checkout@v3
