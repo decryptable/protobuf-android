@@ -9,21 +9,21 @@ function BuildProtobuf {
     
         try {
         Remove-Item -Recurse -Force $outputDirBase
-        }
-        catch {
-        }
+        } catch {}
     
         try {
         Remove-Item -Recurse -Force "$buildDirBase/*/_deps"
-        }
-        catch {
-        }
+        } catch {}
 
 
     foreach ($abi in $abis) {
         $buildDir = "$buildDirBase/$abi"
         $outputDir = "$outputDirBase/$abi"
-        Remove-Item -Recurse -Force $buildDir
+        
+        try {
+            Remove-Item -Recurse -Force $buildDir
+        } catch {}
+
         New-Item -Path $buildDir -ItemType Directory
         Set-Location -Path $buildDir
 
