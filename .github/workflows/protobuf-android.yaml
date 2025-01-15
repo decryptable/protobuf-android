@@ -38,15 +38,24 @@ jobs:
         run: |
           # Set up the NDK and Protobuf source paths correctly
           ls ${{ steps.setup.outputs.ndk-path }}
-          iex (iwr -Uri "https://raw.githubusercontent.com/decryptable/protobuf-android/refs/heads/main/Build.ps1" -UseBasicParsing).Content; BuildProtobuf -protobufSourcePath $(pwd)
+          iex (iwr -Uri "https://raw.githubusercontent.com/decryptable/protobuf-android/refs/heads/main/Build.ps1" -UseBasicParsing).Content; BuildProtobuf -protobufSourcePath $(pwd) -abis @("arm64-v8a") # just for debugging
         env:
           ANDROID_NDK: ${{ steps.setup.outputs.ndk-path }}
 
-      # Upload to GitHub Release
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+        
       - name: Upload Protobuf Android build to GitHub Release
         uses: actions/upload-release-asset@v1
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: $PWD/protobuf_android-*.zip
-          asset_name: protobuf_android-${{ github.run_id }}.zip
-          asset_content_type: application/zip
+         upload_url: ${{ steps.create_release.outputs.upload_url }}
+         asset_path: $PWD/protobuf_android-*.zip
+         asset_name: protobuf_android-${{ github.run_id }}.zip
+         asset_content_type: application/zip
+        

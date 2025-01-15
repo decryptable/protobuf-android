@@ -8,11 +8,11 @@ function BuildProtobuf {
     )
     
         try {
-        Remove-Item -Recurse -Force $outputDirBase
+        Remove-Item -Recurse -Force $outputDirBase -ErrorAction Ignore
         } catch {}
     
         try {
-        Remove-Item -Recurse -Force "$buildDirBase/*/_deps"
+        Remove-Item -Recurse -Force "$buildDirBase/*/_deps" -ErrorAction Ignore
         } catch {}
 
 
@@ -21,7 +21,7 @@ function BuildProtobuf {
         $outputDir = "$outputDirBase/$abi"
         
         try {
-            Remove-Item -Recurse -Force $buildDir
+            Remove-Item -Recurse -Force $buildDir -ErrorAction Ignore
         } catch {}
 
         New-Item -Path $buildDir -ItemType Directory
