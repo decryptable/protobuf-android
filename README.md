@@ -42,7 +42,6 @@ BuildProtobuf -protobufSourcePath <Path_to_Protobuf_Source> -ndkPath <Path_to_ND
 - `outputDirBase` (optional): Base directory for final outputs. Defaults to `$PWD/output`.
 - `abis` (optional): Array of ABIs to build for. Defaults to `@("arm64-v8a", "armeabi-v7a", "x86_64", "x86")`.
 
----
 
 ### 2. .github/workflows/protobuf-android.yaml
 
@@ -61,7 +60,6 @@ A GitHub Actions workflow that:
 3. Execute the `Build.ps1` script for building Protobuf libraries.
 4. Upload the `.zip` artifacts to the corresponding GitHub Release.
 
----
 
 ## Getting Started
 
@@ -86,7 +84,6 @@ A GitHub Actions workflow that:
 
 3. Check the `output` directory for generated `.zip` files.
 
----
 
 ## GitHub Actions CI/CD
 
@@ -100,19 +97,11 @@ To trigger the CI/CD pipeline:
 
 The workflow will automatically build and upload the Protobuf libraries to the GitHub Release page.
 
----
 
 ## Contributing
 
 Contributions are welcome! Please feel free to open issues or submit pull requests for bug fixes, new features, or enhancements.
 
----
-
-## License
-
-This repository is licensed under the [MIT License](LICENSE). Please check the Protobuf repository for its own licensing terms.
-
----
 
 ## Acknowledgments
 
