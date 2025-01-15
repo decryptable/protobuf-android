@@ -23,7 +23,7 @@ jobs:
 
       - name: Set up NDK
         id: setup
-        uses: actions/setup-android@v2
+        uses: nttld/setup-ndk@v1
         with:
           ndk-version: "27.2.12479018"
 
