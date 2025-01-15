@@ -25,7 +25,7 @@ jobs:
         id: setup
         uses: nttld/setup-ndk@v1
         with:
-          ndk-version: "27.2.12479018"
+          ndk-version: "r27c"
 
       - name: Build Protobuf for multiple ABIs 🏗️
         run: |
