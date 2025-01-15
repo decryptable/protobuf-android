@@ -23,21 +23,21 @@ jobs:
           path: protobuf
           submodules: true
 
-      # Set up NDK (comment this line. just for debugging!)
-      # - name: Set up NDK
-      #   id: setup
-      #   uses: nttld/setup-ndk@v1
-      #   with:
-      #     ndk-version: "r27c"
-      #     local-cache: true
-      #   continue-on-error: false
+      # Set up NDK
+      - name: Set up NDK
+        id: setup
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: "r27c"
+          local-cache: true
+        continue-on-error: false
 
       # Build the Protobuf for Android
       - name: Build Protobuf
         working-directory: ${{ github.workspace }}/protobuf
         run: |
           # Set up the NDK and Protobuf source paths correctly
-          ls
+          ls ${{ steps.setup.outputs.ndk-path }}
           iex (iwr -Uri "https://raw.githubusercontent.com/decryptable/protobuf-android/refs/heads/main/Build.ps1" -UseBasicParsing).Content; BuildProtobuf -protobufSourcePath $(pwd)
         env:
           ANDROID_NDK: ${{ steps.setup.outputs.ndk-path }}
