@@ -7,8 +7,18 @@ function BuildProtobuf {
         [array]$abis = @("arm64-v8a", "armeabi-v7a", "x86_64", "x86")
     )
     
-    Remove-Item -Recurse -Force $outputDirBase
-    Remove-Item -Recurse -Force "$buildDirBase/*/_deps"
+        try {
+        Remove-Item -Recurse -Force $outputDirBase
+        }
+        catch {
+        }
+    
+        try {
+        Remove-Item -Recurse -Force "$buildDirBase/*/_deps"
+        }
+        catch {
+        }
+
 
     foreach ($abi in $abis) {
         $buildDir = "$buildDirBase/$abi"
