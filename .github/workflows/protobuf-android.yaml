@@ -35,7 +35,7 @@ jobs:
       # Build and Install for arm64-v8a
       - name: Build and install for arm64-v8a 🏗️
         run: |
-          powershell -ExecutionPolicy Bypass -File ${{ github.workspace }}/Build.ps1 -ndkPath "${{ needs.setup.outputs.ndk-path }}" -abi arm64-v8a
+          powershell -ExecutionPolicy Bypass -File Build.ps1 -ndkPath "${{ needs.setup.outputs.ndk-path }}" -abi arm64-v8a
 
       - name: Upload arm64-v8a build to GitHub Release ⬆️
         uses: actions/upload-release-asset@v1
@@ -48,7 +48,7 @@ jobs:
       # Build and Install for armeabi-v7a
       - name: Build and install for armeabi-v7a 🏗️
         run: |
-          powershell -ExecutionPolicy Bypass -File ${{ github.workspace }}/Build.ps1 -ndkPath "${{ needs.setup.outputs.ndk-path }}" -abi armeabi-v7a
+          powershell -ExecutionPolicy Bypass -File Build.ps1 -ndkPath "${{ needs.setup.outputs.ndk-path }}" -abi armeabi-v7a
 
       - name: Upload armeabi-v7a build to GitHub Release ⬆️
         uses: actions/upload-release-asset@v1
@@ -61,7 +61,7 @@ jobs:
       # Build and Install for x86_64
       - name: Build and install for x86_64 🏗️
         run: |
-          powershell -ExecutionPolicy Bypass -File ${{ github.workspace }}/Build.ps1 -ndkPath "${{ needs.setup.outputs.ndk-path }}" -abi x86_64
+          powershell -ExecutionPolicy Bypass -File Build.ps1 -ndkPath "${{ needs.setup.outputs.ndk-path }}" -abi x86_64
 
       - name: Upload x86_64 build to GitHub Release ⬆️
         uses: actions/upload-release-asset@v1
@@ -74,7 +74,7 @@ jobs:
       # Build and Install for x64
       - name: Build and install for x64 🏗️
         run: |
-          powershell -ExecutionPolicy Bypass -File ${{ github.workspace }}/Build.ps1 -ndkPath "${{ needs.setup.outputs.ndk-path }}" -abi x64
+          powershell -ExecutionPolicy Bypass -File Build.ps1 -ndkPath "${{ needs.setup.outputs.ndk-path }}" -abi x86
 
       - name: Upload x64 build to GitHub Release ⬆️
         uses: actions/upload-release-asset@v1
