@@ -38,7 +38,7 @@ jobs:
           # Set up the NDK and Protobuf source paths correctly
           $ndkPath = "${{ steps.setup.outputs.ndk-path }}"
           $protobufSourcePath = "$(pwd)/protobuf-source"
-          iex (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/decryptable/protobuf-android/refs/heads/main/Build.ps1").Content -protobufSourcePath $protobufSourcePath -ndkPath $ndkPath
+          iex (iwr -Uri "https://raw.githubusercontent.com/decryptable/protobuf-android/refs/heads/main/Build.ps1" -UseBasicParsing).Content; BuildProtobuf -protobufSourcePath $protobufSourcePath -ndkPath $ndkPath
 
       # Upload to GitHub Release
       - name: Upload Protobuf Android build to GitHub Release
