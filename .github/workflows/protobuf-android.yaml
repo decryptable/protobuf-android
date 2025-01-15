@@ -41,6 +41,7 @@ jobs:
           iex (iwr -Uri "https://raw.githubusercontent.com/decryptable/protobuf-android/refs/heads/main/Build.ps1" -UseBasicParsing).Content; BuildProtobuf -protobufSourcePath $(pwd) -abis @("arm64-v8a") # just for debugging
         env:
           ANDROID_NDK: ${{ steps.setup.outputs.ndk-path }}
+        continue-on-error: false
 
       - name: Create GitHub Release
         id: create_release
@@ -49,7 +50,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           draft: false
-          prerelease: false
+          prerelease: true
         
       - name: Upload Protobuf Android build to GitHub Release
         uses: actions/upload-release-asset@v1
