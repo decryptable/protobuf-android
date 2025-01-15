@@ -1,0 +1,261 @@
+name: Build Protobuf for Android
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger on version tags (e.g., v1.0.0)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+  actions: read
+  
+jobs:
+  setup:
+    name: Setup NDK and Checkout Repository 🔧
+    runs-on: windows-latest
+    outputs:
+      ndk-path: ${{ steps.setup-ndk.outputs.ndk-path }}
+    steps:
+      - name: Checkout Protobuf repository 🔽
+        uses: actions/checkout@v3
+        with:
+          repository: protocolbuffers/protobuf
+          path: protobuf-source
+
+      - name: Set up Android NDK 🔧
+        id: setup-ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r27c
+          local-cache: true
+          link-to-sdk: true
+
+  build-arm64-v8a:
+    name: Build Protobuf for arm64-v8a 🏗️
+    runs-on: windows-latest
+    needs: setup
+    steps:
+      - name: Checkout Protobuf repository 🔽
+        uses: actions/checkout@v3
+        with:
+          repository: protocolbuffers/protobuf
+          path: protobuf-source
+
+      - name: Build Protobuf for arm64-v8a 📦
+        run: |
+          $ndkPath = ${{ needs.setup.outputs.ndk-path }}
+          $protobufSourcePath = "$env:GITHUB_WORKSPACE/protobuf-source"
+          $buildDirBase = "$env:GITHUB_WORKSPACE/build"
+          $outputDirBase = "$env:GITHUB_WORKSPACE/output"
+          $abi = "arm64-v8a"
+          
+          $buildDir = "$buildDirBase/$abi"
+          $outputDir = "$outputDirBase/$abi"
+
+          if (Test-Path $buildDir) {
+              Remove-Item -Recurse -Force $buildDir
+          }
+          New-Item -Path $buildDir -ItemType Directory
+
+          cmake -G "MinGW Makefiles" `
+          -DCMAKE_TOOLCHAIN_FILE="$ndkPath/build/cmake/android.toolchain.cmake" `
+          -DANDROID_ABI="$abi" `
+          -DANDROID_PLATFORM=21 `
+          -DCMAKE_C_COMPILER="$ndkPath/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe" `
+          -DCMAKE_CXX_COMPILER="$ndkPath/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe" `
+          -DCMAKE_MAKE_PROGRAM="$ndkPath/prebuilt/windows-x86_64/bin/make.exe" `
+          -Dprotobuf_BUILD_TESTS=OFF `
+          -Dprotobuf_BUILD_SHARED_LIBS=OFF `
+          -Dprotobuf_ABSL_PROVIDER=package `
+          -DCMAKE_INSTALL_PREFIX="$outputDir" `
+          -Wno-deprecated `
+          "$protobufSourcePath"
+
+          cmake --build .
+          cmake --install .
+
+      - name: Compress build output for arm64-v8a 📦
+        run: |
+          $zipPath = "$env:GITHUB_WORKSPACE/protobuf-arm64-v8a-${GITHUB_REF##*/}.zip"
+          Compress-Archive -Path "$env:GITHUB_WORKSPACE/output/$abi/*" -DestinationPath $zipPath
+
+      - name: Upload arm64-v8a build to GitHub Release ⬆️
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ env.GITHUB_WORKSPACE }}/protobuf-arm64-v8a-${GITHUB_REF##*/}.zip
+          asset_name: protobuf-arm64-v8a-${GITHUB_REF##*/}.zip
+          asset_content_type: application/zip
+
+  build-armeabi-v7a:
+    name: Build Protobuf for armeabi-v7a 🏗️
+    runs-on: windows-latest
+    needs: setup
+    steps:
+      - name: Checkout Protobuf repository 🔽
+        uses: actions/checkout@v3
+        with:
+          repository: protocolbuffers/protobuf
+          path: protobuf-source
+
+      - name: Build Protobuf for armeabi-v7a 📦
+        run: |
+          $ndkPath = ${{ needs.setup.outputs.ndk-path }}
+          $protobufSourcePath = "$env:GITHUB_WORKSPACE/protobuf-source"
+          $buildDirBase = "$env:GITHUB_WORKSPACE/build"
+          $outputDirBase = "$env:GITHUB_WORKSPACE/output"
+          $abi = "armeabi-v7a"
+          
+          $buildDir = "$buildDirBase/$abi"
+          $outputDir = "$outputDirBase/$abi"
+
+          if (Test-Path $buildDir) {
+              Remove-Item -Recurse -Force $buildDir
+          }
+          New-Item -Path $buildDir -ItemType Directory
+
+          cmake -G "MinGW Makefiles" `
+          -DCMAKE_TOOLCHAIN_FILE="$ndkPath/build/cmake/android.toolchain.cmake" `
+          -DANDROID_ABI="$abi" `
+          -DANDROID_PLATFORM=21 `
+          -DCMAKE_C_COMPILER="$ndkPath/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe" `
+          -DCMAKE_CXX_COMPILER="$ndkPath/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe" `
+          -DCMAKE_MAKE_PROGRAM="$ndkPath/prebuilt/windows-x86_64/bin/make.exe" `
+          -Dprotobuf_BUILD_TESTS=OFF `
+          -Dprotobuf_BUILD_SHARED_LIBS=OFF `
+          -Dprotobuf_ABSL_PROVIDER=package `
+          -DCMAKE_INSTALL_PREFIX="$outputDir" `
+          -Wno-deprecated `
+          "$protobufSourcePath"
+
+          cmake --build .
+          cmake --install .
+
+      - name: Compress build output for armeabi-v7a 📦
+        run: |
+          $zipPath = "$env:GITHUB_WORKSPACE/protobuf-armeabi-v7a-${GITHUB_REF##*/}.zip"
+          Compress-Archive -Path "$env:GITHUB_WORKSPACE/output/$abi/*" -DestinationPath $zipPath
+
+      - name: Upload armeabi-v7a build to GitHub Release ⬆️
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ env.GITHUB_WORKSPACE }}/protobuf-armeabi-v7a-${GITHUB_REF##*/}.zip
+          asset_name: protobuf-armeabi-v7a-${GITHUB_REF##*/}.zip
+          asset_content_type: application/zip
+
+  build-x86_64:
+    name: Build Protobuf for x86_64 🏗️
+    runs-on: windows-latest
+    needs: setup
+    steps:
+      - name: Checkout Protobuf repository 🔽
+        uses: actions/checkout@v3
+        with:
+          repository: protocolbuffers/protobuf
+          path: protobuf-source
+
+      - name: Build Protobuf for x86_64 📦
+        run: |
+          $ndkPath = ${{ needs.setup.outputs.ndk-path }}
+          $protobufSourcePath = "$env:GITHUB_WORKSPACE/protobuf-source"
+          $buildDirBase = "$env:GITHUB_WORKSPACE/build"
+          $outputDirBase = "$env:GITHUB_WORKSPACE/output"
+          $abi = "x86_64"
+          
+          $buildDir = "$buildDirBase/$abi"
+          $outputDir = "$outputDirBase/$abi"
+
+          if (Test-Path $buildDir) {
+              Remove-Item -Recurse -Force $buildDir
+          }
+          New-Item -Path $buildDir -ItemType Directory
+
+          cmake -G "MinGW Makefiles" `
+          -DCMAKE_TOOLCHAIN_FILE="$ndkPath/build/cmake/android.toolchain.cmake" `
+          -DANDROID_ABI="$abi" `
+          -DANDROID_PLATFORM=21 `
+          -DCMAKE_C_COMPILER="$ndkPath/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe" `
+          -DCMAKE_CXX_COMPILER="$ndkPath/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe" `
+          -DCMAKE_MAKE_PROGRAM="$ndkPath/prebuilt/windows-x86_64/bin/make.exe" `
+          -Dprotobuf_BUILD_TESTS=OFF `
+          -Dprotobuf_BUILD_SHARED_LIBS=OFF `
+          -Dprotobuf_ABSL_PROVIDER=package `
+          -DCMAKE_INSTALL_PREFIX="$outputDir" `
+          -Wno-deprecated `
+          "$protobufSourcePath"
+
+          cmake --build .
+          cmake --install .
+
+      - name: Compress build output for x86_64 📦
+        run: |
+          $zipPath = "$env:GITHUB_WORKSPACE/protobuf-x86_64-${GITHUB_REF##*/}.zip"
+          Compress-Archive -Path "$env:GITHUB_WORKSPACE/output/$abi/*" -DestinationPath $zipPath
+
+      - name: Upload x86_64 build to GitHub Release ⬆️
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ env.GITHUB_WORKSPACE }}/protobuf-x86_64-${GITHUB_REF##*/}.zip
+          asset_name: protobuf-x86_64-${GITHUB_REF##*/}.zip
+          asset_content_type: application/zip
+
+  build-x64:
+    name: Build Protobuf for x64 🏗️
+    runs-on: windows-latest
+    needs: setup
+    steps:
+      - name: Checkout Protobuf repository 🔽
+        uses: actions/checkout@v3
+        with:
+          repository: protocolbuffers/protobuf
+          path: protobuf-source
+
+      - name: Build Protobuf for x64 📦
+        run: |
+          $ndkPath = ${{ needs.setup.outputs.ndk-path }}
+          $protobufSourcePath = "$env:GITHUB_WORKSPACE/protobuf-source"
+          $buildDirBase = "$env:GITHUB_WORKSPACE/build"
+          $outputDirBase = "$env:GITHUB_WORKSPACE/output"
+          $abi = "x64"
+          
+          $buildDir = "$buildDirBase/$abi"
+          $outputDir = "$outputDirBase/$abi"
+
+          if (Test-Path $buildDir) {
+              Remove-Item -Recurse -Force $buildDir
+          }
+          New-Item -Path $buildDir -ItemType Directory
+
+          cmake -G "MinGW Makefiles" `
+          -DCMAKE_TOOLCHAIN_FILE="$ndkPath/build/cmake/android.toolchain.cmake" `
+          -DANDROID_ABI="$abi" `
+          -DANDROID_PLATFORM=21 `
+          -DCMAKE_C_COMPILER="$ndkPath/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe" `
+          -DCMAKE_CXX_COMPILER="$ndkPath/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe" `
+          -DCMAKE_MAKE_PROGRAM="$ndkPath/prebuilt/windows-x86_64/bin/make.exe" `
+          -Dprotobuf_BUILD_TESTS=OFF `
+          -Dprotobuf_BUILD_SHARED_LIBS=OFF `
+          -Dprotobuf_ABSL_PROVIDER=package `
+          -DCMAKE_INSTALL_PREFIX="$outputDir" `
+          -Wno-deprecated `
+          "$protobufSourcePath"
+
+          cmake --build .
+          cmake --install .
+
+      - name: Compress build output for x64 📦
+        run: |
+          $zipPath = "$env:GITHUB_WORKSPACE/protobuf-x64-${GITHUB_REF##*/}.zip"
+          Compress-Archive -Path "$env:GITHUB_WORKSPACE/output/$abi/*" -DestinationPath $zipPath
+
+      - name: Upload x64 build to GitHub Release ⬆️
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ env.GITHUB_WORKSPACE }}/protobuf-x64-${GITHUB_REF##*/}.zip
+          asset_name: protobuf-x64-${GITHUB_REF##*/}.zip
+          asset_content_type: application/zip
