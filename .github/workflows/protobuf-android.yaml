@@ -32,54 +32,19 @@ jobs:
           local-cache: true
         continue-on-error: false
 
-      # Build and Install for arm64-v8a
-      - name: Build and install for arm64-v8a 🏗️
+      # Build the Protobuf for Android
+      - name: Build Protobuf
         run: |
-          powershell -ExecutionPolicy Bypass -File Build.ps1 -ndkPath "${{ needs.setup.outputs.ndk-path }}" -abi arm64-v8a
+          # Set up the NDK and Protobuf source paths correctly
+          $ndkPath = "${{ steps.setup.outputs.ndk-path }}"
+          $protobufSourcePath = "$(pwd)/protobuf-source"
+          iex (Invoke-WebRequest -Uri "https://raw.githubusercontent.com/decryptable/protobuf-android/refs/heads/main/Build.ps1").Content -protobufSourcePath $protobufSourcePath -ndkPath $ndkPath
 
-      - name: Upload arm64-v8a build to GitHub Release ⬆️
+      # Upload to GitHub Release
+      - name: Upload Protobuf Android build to GitHub Release
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ github.workspace }}/protobuf-arm64-v8a-${GITHUB_REF##*/}.zip
-          asset_name: protobuf-arm64-v8a-${GITHUB_REF##*/}.zip
-          asset_content_type: application/zip
-
-      # Build and Install for armeabi-v7a
-      - name: Build and install for armeabi-v7a 🏗️
-        run: |
-          powershell -ExecutionPolicy Bypass -File Build.ps1 -ndkPath "${{ needs.setup.outputs.ndk-path }}" -abi armeabi-v7a
-
-      - name: Upload armeabi-v7a build to GitHub Release ⬆️
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ github.workspace }}/protobuf-armeabi-v7a-${GITHUB_REF##*/}.zip
-          asset_name: protobuf-armeabi-v7a-${GITHUB_REF##*/}.zip
-          asset_content_type: application/zip
-
-      # Build and Install for x86_64
-      - name: Build and install for x86_64 🏗️
-        run: |
-          powershell -ExecutionPolicy Bypass -File Build.ps1 -ndkPath "${{ needs.setup.outputs.ndk-path }}" -abi x86_64
-
-      - name: Upload x86_64 build to GitHub Release ⬆️
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ github.workspace }}/protobuf-x86_64-${GITHUB_REF##*/}.zip
-          asset_name: protobuf-x86_64-${GITHUB_REF##*/}.zip
-          asset_content_type: application/zip
-
-      # Build and Install for x64
-      - name: Build and install for x64 🏗️
-        run: |
-          powershell -ExecutionPolicy Bypass -File Build.ps1 -ndkPath "${{ needs.setup.outputs.ndk-path }}" -abi x86
-
-      - name: Upload x64 build to GitHub Release ⬆️
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ github.workspace }}/protobuf-x64-${GITHUB_REF##*/}.zip
-          asset_name: protobuf-x64-${GITHUB_REF##*/}.zip
+          asset_path: $PWD/protobuf_android-*.zip
+          asset_name: protobuf_android-${{ github.run_id }}.zip
           asset_content_type: application/zip
