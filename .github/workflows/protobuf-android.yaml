@@ -16,7 +16,7 @@ jobs:
     runs-on: windows-latest
     steps:
       # Checkout repository including submodules
-      - name: Checkout Protobuf repository including submodules 🔽
+      - name: Checkout Protobuf repository including submodules
         uses: actions/checkout@v3
         with:
           repository: protocolbuffers/protobuf
@@ -34,11 +34,13 @@ jobs:
 
       # Build the Protobuf for Android
       - name: Build Protobuf
+        working-directory: "$(pwd)/protobuf-source"
         run: |
           # Set up the NDK and Protobuf source paths correctly
-          $ndkPath = "${{ steps.setup.outputs.ndk-path }}"
-          $protobufSourcePath = "$(pwd)/protobuf-source"
-          iex (iwr -Uri "https://raw.githubusercontent.com/decryptable/protobuf-android/refs/heads/main/Build.ps1" -UseBasicParsing).Content; BuildProtobuf -protobufSourcePath $protobufSourcePath -ndkPath $ndkPath
+          ls
+          iex (iwr -Uri "https://raw.githubusercontent.com/decryptable/protobuf-android/refs/heads/main/Build.ps1" -UseBasicParsing).Content; BuildProtobuf -protobufSourcePath $(pwd)
+        env:
+          ANDROID_NDK: ${{ steps.setup.outputs.ndk-path }}
 
       # Upload to GitHub Release
       - name: Upload Protobuf Android build to GitHub Release
