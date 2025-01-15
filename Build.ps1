@@ -34,7 +34,6 @@ function BuildProtobuf {
             -DCMAKE_TOOLCHAIN_FILE="$ndkPath/build/cmake/android.toolchain.cmake" `
             -DANDROID_ABI="$abi" `
             -DANDROID_PLATFORM=21 `
-            -DABSL_PROPAGATE_CXX_STD=ON `
             -DCMAKE_C_COMPILER="$ndkPath/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe" `
             -DCMAKE_CXX_COMPILER="$ndkPath/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe" `
             -DCMAKE_MAKE_PROGRAM="$ndkPath/prebuilt/windows-x86_64/bin/make.exe" `
@@ -45,8 +44,8 @@ function BuildProtobuf {
             -Wno-deprecated `
             "$protobufSourcePath"
 
-        cmake --build . --target libprotobuf protobuf-lite --parallel=10 --clean-first --resolve-package-references=on
-        cmake --install . --parallel=10
+        cmake --build . --target libprotobuf --parallel=10 --clean-first --resolve-package-references=on
+        cmake --install .
 
         Write-Host "Protobuf build for ABI $abi is complete."
 
