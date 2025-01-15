@@ -21,7 +21,7 @@ jobs:
         with:
           repository: protocolbuffers/protobuf
           path: protobuf-source
-          submodules: true  # Ini memastikan submodule ikut ter-checkout
+          submodules: true
 
       # Set up NDK
       - name: Set up NDK
