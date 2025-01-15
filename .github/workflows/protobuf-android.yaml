@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: protocolbuffers/protobuf
-          path: protobuf-source
+          path: protobuf
           submodules: true
 
       # Set up NDK
@@ -34,7 +34,7 @@ jobs:
 
       # Build the Protobuf for Android
       - name: Build Protobuf
-        working-directory: "$(pwd)/protobuf-source"
+        working-directory: "$(pwd)/protobuf"
         run: |
           # Set up the NDK and Protobuf source paths correctly
           ls
